@@ -1,0 +1,16 @@
+{
+  "name": "patternmatching",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^25.2.3"
+  }
+}
