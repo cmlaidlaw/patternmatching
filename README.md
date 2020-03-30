@@ -138,3 +138,6 @@ const factorial = Match(
 
 factorial( 3 ); // Returns 6
 ```
+
+## Tests
+Run `npm test`.
