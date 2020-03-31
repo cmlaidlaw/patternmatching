@@ -97,6 +97,14 @@ test( 'evaluates object patterns correctly', () => {
 	expect( objects( { a: 1, b: 2 } ) ).toBe( 'a is 1 and b is 2.' );
 	expect( objects( { a: 'hello', b: 'world' } ) ).toBe( 'a is "hello" and b is "world".' );
 	expect( objects( { a: { a: true, b: false }, b: { a: 1, b: 2 } } ) ).toBe( 'a is { a: true, b: false } and b is { a: 1, b: 2 }.' );
+
+	const objectsWithPrimitiveTypePredicates = Match(
+		Case( { a: Boolean, b: Number }, () => 'a is a boolean and b is a number.' ),
+		Case( { a: String, b: Object }, () => 'a is a string and b is an object.' )
+	);
+
+	expect( objectsWithPrimitiveTypePredicates( { a: true, b: 1 } ) ).toBe( 'a is a boolean and b is a number.' );
+	expect( objectsWithPrimitiveTypePredicates( { a: 'hello', b: { a: 'world' } } ) ).toBe( 'a is a string and b is an object.' );
 } );
 
 test( 'evaluates language primitive patterns correctly', () => {

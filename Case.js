@@ -70,19 +70,19 @@ class _Case {
 			// Match literal values. In this case we want to assert the strict equality of patternThing
 			// and valueThing, not just that valueThing is of the type specified by patternThing.
 			if ( this._isPlainObject( patternThing ) ) {
-				valueMatches = this._isPlainObject( valueThing ) && this._deepEqual( valueThing, patternThing );
+				valueMatches = this._isPlainObject( valueThing ) && this._deepEqualWithOptionalLeftSidePrimitiveTypes( patternThing, valueThing );
 			}
 
 			if ( this._isString( patternThing ) ) {
-				valueMatches = this._isString( valueThing ) && this._deepEqual( valueThing, patternThing );
+				valueMatches = this._isString( valueThing ) && this._deepEqualWithOptionalLeftSidePrimitiveTypes( patternThing, valueThing );
 			}
 
 			if ( this._isNumber( patternThing ) ) {
-				valueMatches = this._isNumber( valueThing ) && this._deepEqual( valueThing, patternThing );
+				valueMatches = this._isNumber( valueThing ) && this._deepEqualWithOptionalLeftSidePrimitiveTypes( patternThing, valueThing );
 			}
 
 			if ( this._isBoolean( patternThing ) ) {
-				valueMatches = this._isBoolean( valueThing ) && this._deepEqual( valueThing, patternThing );
+				valueMatches = this._isBoolean( valueThing ) && this._deepEqualWithOptionalLeftSidePrimitiveTypes( patternThing, valueThing );
 			}
 
 			if ( ! valueMatches ) {
@@ -181,13 +181,13 @@ class _Case {
 	}
 
 	// Adapted from https://stackoverflow.com/a/32922084.
-	_deepEqual( a, b ) {
+	_deepEqualWithOptionalLeftSidePrimitiveTypes( a, b ) {
 
 		const typeOfA = typeof a;
 		const typeOfB = typeof b;
 
 		// If a and b are both objects and are superficially strongly equal do a recursive
-		// strong equality check of their properties.
+		// comparison of their properties.
 		if (
 			a &&
 			b &&
@@ -197,11 +197,29 @@ class _Case {
 
 			return (
 				( Object.keys( a ).length === Object.keys( b ).length ) &&
-				( Object.keys( a ).every( ( key ) => this._deepEqual( a[ key ], b[ key ] ) ) )
+				( Object.keys( a ).every( ( key ) => this._deepEqualWithOptionalLeftSidePrimitiveTypes( a[ key ], b[ key ] ) ) )
 			);
-		// Otherwise the superficial strong equality check is fine.
+		// Otherwise check for language primitive types.
 		} else {
-			return ( a === b );
+
+			switch ( a ) {
+
+				case Object:
+					return this._isPlainObject( b );
+
+				case String:
+					return this._isString( b );
+
+				case Number:
+					return this._isNumber( b );
+
+				case Boolean:
+					return this._isBoolean( b );
+
+				// Finally default to a strong equality check.
+				default:
+					return ( a === b );
+			}
 		}
 	}
 }
