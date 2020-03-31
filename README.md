@@ -16,8 +16,8 @@ if ( user.isAdmin ) {
 The same code using `Match` will immediately throw an error if `user` does not have the expected properties because it tests values strictly:
 ```
 let recordUserLogin = Match(
-	Case( { isAdmin: true }, ( user ) => { db.adminUserLoggedIn( user.id ); } ),
-	Case( { isAdmin: false }, ( user ) => { db.userLoggedIn( user.id ); } ),
+	Case( { isAdmin: true, id: Number }, ( user ) => { db.adminUserLoggedIn( user.id ); } ),
+	Case( { isAdmin: false, id: Number }, ( user ) => { db.userLoggedIn( user.id ); } )
 );
 
 recordUserLogin( user );
@@ -27,14 +27,16 @@ In order to make the original code as robust as `Match` we would need to add add
 ```
 if (
 	user.hasOwnProperty( 'isAdmin' ) &&
-	( typeof user.isAdmin === 'boolean' ) &&
-	user.isAdmin
+	( user.isAdmin === true ) &&
+	user.hasOwnProperty( 'id' ) &&
+	( typeof user.id === 'number' )
 ) {
 	db.adminUserLoggedIn( user.id );
 } else if (
 	user.hasOwnProperty( 'isAdmin' ) &&
-	( typeof user.isAdmin === 'boolean' ) &&
-	( ! user.isAdmin )
+	( user.isAdmin === false ) &&
+	user.hasOwnProperty( 'id' ) &&
+	( typeof user.id === 'number' )
 ) {
 	db.userLoggedIn( user.id );
 } else {
@@ -70,7 +72,7 @@ Items passed to `Case` may be of the following types:
 * User-defined classes (e.g. `User`, if a `User` class has been defined and exists in the current context).
 
 Literal types will strictly match values, and in the case of objects, will be deeply-compared.
-Primitive types will match any instance of that type (e.g. `Number` will match `0` but not `'0'`. User-defined classes will match any instance of that class (e.g. `User` will match live instances of `User` but not live instances of other classes).
+Primitive types will match any instance of that type (e.g. `Number` will match `0` but not `'0'`. Primitive types can also be used as values for object properties (e.g. `{ key: Boolean }` will match any object with a property called `key` that has a value of type `Boolean`). User-defined classes will match any instance of that class (e.g. `User` will match live instances of `User` but not live instances of other classes).
 
 ### Match
 ```
