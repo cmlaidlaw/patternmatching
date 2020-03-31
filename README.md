@@ -4,7 +4,7 @@ Simplify complex control flows and quickly surface runtime errors by using patte
 ## Why?
 Certain types of runtime errors (especially TypeErrors) can lead to increasingly unexpected behavior the further they propagate. By using `Match` functions for flow control rather than `if` statements we can be alerted higher up the call stack when a value is not of the type (or types) that we expect.
 
-For example, in the following code the `user` object might be undefined but the code will still attempt to pass the `id` property to `db.userLoggedIn()`. Depending on the implementation of `db.userLoggedIn()` this may or may not result in unexpected data being written to the database:
+For example, in the following code the `user` object might be be empty or of an unexpected format but the code will still attempt to pass the `id` property (the value of which might be `undefined`) to `db.userLoggedIn()`. Depending on the implementation of `db.userLoggedIn()` this may or may not result in unexpected data being written to the database:
 ```
 if ( user.isAdmin ) {
 	db.adminUserLoggedIn( user.id );
