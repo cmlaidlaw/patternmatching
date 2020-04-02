@@ -70,19 +70,19 @@ class _Case {
 			// Match literal values. In this case we want to assert the strict equality of patternThing
 			// and valueThing, not just that valueThing is of the type specified by patternThing.
 			if ( this._isPlainObject( patternThing ) ) {
-				valueMatches = this._isPlainObject( valueThing ) && this._deepEqualWithOptionalLeftSidePrimitiveTypes( patternThing, valueThing );
+				valueMatches = this._isPlainObject( valueThing ) && this._deepCompare( patternThing, valueThing );
 			}
 
 			if ( this._isString( patternThing ) ) {
-				valueMatches = this._isString( valueThing ) && this._deepEqualWithOptionalLeftSidePrimitiveTypes( patternThing, valueThing );
+				valueMatches = this._isString( valueThing ) && this._deepCompare( patternThing, valueThing );
 			}
 
 			if ( this._isNumber( patternThing ) ) {
-				valueMatches = this._isNumber( valueThing ) && this._deepEqualWithOptionalLeftSidePrimitiveTypes( patternThing, valueThing );
+				valueMatches = this._isNumber( valueThing ) && this._deepCompare( patternThing, valueThing );
 			}
 
 			if ( this._isBoolean( patternThing ) ) {
-				valueMatches = this._isBoolean( valueThing ) && this._deepEqualWithOptionalLeftSidePrimitiveTypes( patternThing, valueThing );
+				valueMatches = this._isBoolean( valueThing ) && this._deepCompare( patternThing, valueThing );
 			}
 
 			if ( ! valueMatches ) {
@@ -181,44 +181,47 @@ class _Case {
 	}
 
 	// Adapted from https://stackoverflow.com/a/32922084.
-	_deepEqualWithOptionalLeftSidePrimitiveTypes( a, b ) {
+	//
+	// This function compares right side values to left side values or types. For example,
+	// a 5 on the right side will match both a 5 and also the type Number on the left side.
+	_deepCompare( left, right ) {
 
-		const typeOfA = typeof a;
-		const typeOfB = typeof b;
+		const typeOfLeft = typeof left;
+		const typeOfRight = typeof right;
 
-		// If a and b are both objects and are superficially strongly equal do a recursive
-		// comparison of their properties.
+		// If left and right are both objects do a recursive comparison of their properties.
 		if (
-			a &&
-			b &&
-			typeOfA === 'object' &&
-			typeOfA === typeOfB
+			left &&
+			right &&
+			typeOfLeft === 'object' &&
+			typeOfLeft === typeOfRight
 		) {
 
 			return (
-				( Object.keys( a ).length === Object.keys( b ).length ) &&
-				( Object.keys( a ).every( ( key ) => this._deepEqualWithOptionalLeftSidePrimitiveTypes( a[ key ], b[ key ] ) ) )
+				( Object.keys( left ).length === Object.keys( right ).length ) &&
+				( Object.keys( left ).every( ( key ) => this._deepCompare( left[ key ], right[ key ] ) ) )
 			);
-		// Otherwise check for language primitive types.
+		// Otherwise match primitive types on the left to any value on the right that is an
+		// instance of that type.
 		} else {
 
-			switch ( a ) {
+			switch ( left ) {
 
 				case Object:
-					return this._isPlainObject( b );
+					return this._isPlainObject( right );
 
 				case String:
-					return this._isString( b );
+					return this._isString( right );
 
 				case Number:
-					return this._isNumber( b );
+					return this._isNumber( right );
 
 				case Boolean:
-					return this._isBoolean( b );
+					return this._isBoolean( right );
 
 				// Finally default to a strong equality check.
 				default:
-					return ( a === b );
+					return ( left === right );
 			}
 		}
 	}
